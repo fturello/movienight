@@ -1,12 +1,16 @@
+import React from "react";
 import { Provider as StyletronProvider } from "styletron-react";
 import { styletron } from "../styletron";
+import { LightTheme, BaseProvider } from "baseui";
 
-import "../index.css";
+import "../app.css";
 
 export default function App({ Component, pageProps }) {
 	return (
 		<StyletronProvider value={styletron}>
-			<Component {...pageProps} />
+			<BaseProvider theme={LightTheme}>
+				<Component {...pageProps} />
+			</BaseProvider>
 		</StyletronProvider>
 	);
 }
