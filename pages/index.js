@@ -22,7 +22,7 @@ export const getStaticProps = async () => {
 
 const Container = styled("div", {
 	display: "grid",
-	gridTemplateColumns: "0.4fr 2.2fr 0.4fr",
+	gridTemplateColumns: "0.5fr 2.2fr 0.5fr",
 	gridTemplateRows: "1fr 1fr 1fr",
 	// gap: "20px",
 });
@@ -37,6 +37,7 @@ const CarouselContainer = styled("div", {
 const Section = styled("p", {
 	fontSize: "1.25rem",
 	marginTop: "4rem",
+	marginBottom: "1rem",
 });
 
 const SectionContainer = styled("div", {
@@ -45,11 +46,54 @@ const SectionContainer = styled("div", {
 	gridColumnStart: "2",
 });
 
-export default function Home({ movies }) {
-	console.log(movies.results);
-	const firstThreeTrendingMovies = movies.results.slice(0, 3);
+const PostersContainer = styled("div", {
+	display: "flex",
+});
 
+const CardContainer = styled("div", {
+	flexDirection: "column",
+	marginRight: "20px",
+});
+
+const MovieName = styled("p", {
+	fontSize: "1rem",
+	lineHeight: "1.25rem",
+});
+
+const MovieDuration = styled("p", {
+	fontSize: "0.875rem",
+	color: "#9B9B9B",
+});
+
+const Gauge = styled("meter", {});
+
+export default function Home({ movies }) {
 	const [css] = useStyletron();
+
+	let moviesData = movies.results;
+	console.log("// moviesData ===", moviesData);
+
+	// trois premier films en tendances
+	const firstThreeTrendingMovies = moviesData.slice(0, 3);
+
+	// films tries par date de sortie
+	const moviesSortedByDate = moviesData.sort(
+		(a, b) =>
+			new Date(b.release_date || b.first_air_date) -
+			new Date(a.release_date || a.first_air_date)
+	);
+
+	const mostRecentMovies = moviesSortedByDate.slice(0, 10);
+	console.log("// sorted by date ===", mostRecentMovies);
+
+	// films tries par note
+	const moviesSortedByRatings = [...moviesData].sort(
+		(a, b) => b.vote_average - a.vote_average
+	);
+
+	const bestRatedMovies = moviesSortedByRatings.slice(0, 10);
+	console.log("// sorted by ratings ===", bestRatedMovies);
+
 	return (
 		<>
 			<Navbar />
@@ -71,12 +115,11 @@ export default function Home({ movies }) {
 					>
 						{firstThreeTrendingMovies.map((movie) => (
 							<SwiperSlide key={movie.id}>
-								{console.log(movie.backdrop_path)}
 								<Image
 									src={`https://image.tmdb.org/t/p/w500${movie.backdrop_path}`}
-									alt='Poster'
+									alt='Backdrop image'
 									height={350}
-									width={1300}
+									width={1200}
 									className={css({
 										borderRadius: "0.5rem",
 									})}
@@ -87,13 +130,54 @@ export default function Home({ movies }) {
 				</CarouselContainer>
 				<SectionContainer>
 					<Section>À l'affiche cette semaine</Section>
-
-					<Image
-						src='https://image.tmdb.org/t/p/w500/130H1gap9lFfiTF9iDrqNIkFvC9.jpg'
-						alt=''
-						height={200}
-						width={140}
-					/>
+					<PostersContainer>
+						{mostRecentMovies.map((movie) => (
+							<CardContainer key={movie.id}>
+								<Image
+									key={movie.id}
+									src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+									alt='Poster image'
+									height={200}
+									width={140}
+									className={css({
+										borderRadius: "0.25rem",
+									})}
+								/>
+								<MovieName>{movie.original_title || movie.name}</MovieName>
+								<MovieDuration>1h48</MovieDuration>
+							</CardContainer>
+						))}
+					</PostersContainer>
+				</SectionContainer>
+				<SectionContainer>
+					<Section>Les films les mieux notés</Section>
+					<PostersContainer>
+						{bestRatedMovies.map((movie) => (
+							<CardContainer key={movie.id}>
+								<Image
+									key={movie.id}
+									src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+									alt='Poster image'
+									height={200}
+									width={140}
+									className={css({
+										borderRadius: "0.25rem",
+									})}
+								/>
+								<MovieName>{movie.original_title || movie.name}</MovieName>
+								<Gauge
+									max={10}
+									min={0.0}
+									value={movie.vote_average}
+									high={0.75}
+									low={0.25}
+									optimum={0.8}
+								>
+									1h48
+								</Gauge>
+							</CardContainer>
+						))}
+					</PostersContainer>
 				</SectionContainer>
 			</Container>
 		</>
