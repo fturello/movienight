@@ -3,6 +3,7 @@ import { styled, useStyletron } from "styletron-react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Autoplay } from "swiper";
 import Image from "next/image";
+import Link from "next/link";
 
 import "swiper/css";
 import "swiper/css/navigation";
@@ -24,40 +25,44 @@ const Container = styled("div", {
 	display: "grid",
 	gridTemplateColumns: "0.5fr 2.2fr 0.5fr",
 	gridTemplateRows: "1fr 1fr 1fr",
-	// gap: "20px",
 });
 
 const CarouselContainer = styled("div", {
 	display: "flex",
 	justifyContent: "center",
-	marginTop: "2.25rem",
-	gridColumnStart: "2",
-});
-
-const Section = styled("p", {
-	fontSize: "1.25rem",
-	marginTop: "4rem",
+	marginTop: "2.4rem",
 	marginBottom: "1rem",
+	gridColumnStart: "2",
 });
 
 const SectionContainer = styled("div", {
 	display: "flex",
 	flexDirection: "column",
 	gridColumnStart: "2",
+	width: "1200px",
+	marginLeft: "auto",
+	marginRight: "auto",
+});
+
+const Section = styled("p", {
+	fontSize: "1.25rem",
+	marginTop: "4rem",
+	marginBottom: "2rem",
 });
 
 const PostersContainer = styled("div", {
 	display: "flex",
+	justifyContent: "space-between",
 });
 
 const CardContainer = styled("div", {
 	flexDirection: "column",
-	marginRight: "20px",
 });
 
 const MovieName = styled("p", {
 	fontSize: "1rem",
 	lineHeight: "1.25rem",
+	maxWidth: "140px",
 });
 
 const MovieDuration = styled("p", {
@@ -83,21 +88,37 @@ export default function Home({ movies }) {
 			new Date(a.release_date || a.first_air_date)
 	);
 
-	const mostRecentMovies = moviesSortedByDate.slice(0, 10);
-	console.log("// sorted by date ===", mostRecentMovies);
+	const mostRecentMovies = moviesSortedByDate.slice(0, 7);
+	// console.log("// sorted by date ===", mostRecentMovies);
 
 	// films tries par note
 	const moviesSortedByRatings = [...moviesData].sort(
 		(a, b) => b.vote_average - a.vote_average
 	);
 
-	const bestRatedMovies = moviesSortedByRatings.slice(0, 10);
-	console.log("// sorted by ratings ===", bestRatedMovies);
+	const bestRatedMovies = moviesSortedByRatings.slice(0, 7);
+	// console.log("// sorted by ratings ===", bestRatedMovies);
 
 	return (
 		<>
 			<Navbar />
 			<Container>
+				<Image
+					src={`https://image.tmdb.org/t/p/w500${firstThreeTrendingMovies[0].backdrop_path}`}
+					alt='Background image'
+					height={200}
+					width={140}
+					className={css({
+						position: "absolute",
+						top: "0",
+						width: "100%",
+						height: "60%",
+						maskImage:
+							"linear-gradient(to bottom, rgba(0, 0, 0, 1.0) 30%, transparent 100%);",
+						zIndex: "-999",
+						filter: "blur(2rem)",
+					})}
+				/>
 				<CarouselContainer>
 					<Swiper
 						autoHeight
@@ -133,16 +154,26 @@ export default function Home({ movies }) {
 					<PostersContainer>
 						{mostRecentMovies.map((movie) => (
 							<CardContainer key={movie.id}>
-								<Image
-									key={movie.id}
-									src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-									alt='Poster image'
-									height={200}
-									width={140}
-									className={css({
-										borderRadius: "0.25rem",
-									})}
-								/>
+								<Link
+									href={{
+										pathname: "/MovieDetail",
+										query: {
+											name: `${movie.original_title || movie.name}`,
+										},
+									}}
+									as={`/movie-detail/${movie.original_title || movie.name}`}
+								>
+									<Image
+										key={movie.id}
+										src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+										alt='Poster image'
+										height={200}
+										width={140}
+										className={css({
+											borderRadius: "0.25rem",
+										})}
+									/>
+								</Link>
 								<MovieName>{movie.original_title || movie.name}</MovieName>
 								<MovieDuration>1h48</MovieDuration>
 							</CardContainer>
@@ -154,16 +185,26 @@ export default function Home({ movies }) {
 					<PostersContainer>
 						{bestRatedMovies.map((movie) => (
 							<CardContainer key={movie.id}>
-								<Image
-									key={movie.id}
-									src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-									alt='Poster image'
-									height={200}
-									width={140}
-									className={css({
-										borderRadius: "0.25rem",
-									})}
-								/>
+								<Link
+									href={{
+										pathname: "/MovieDetail",
+										query: {
+											name: `${movie.original_title || movie.name}`,
+										},
+									}}
+									as={`/movie-detail/${movie.original_title || movie.name}`}
+								>
+									<Image
+										key={movie.id}
+										src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+										alt='Poster image'
+										height={200}
+										width={140}
+										className={css({
+											borderRadius: "0.25rem",
+										})}
+									/>
+								</Link>
 								<MovieName>{movie.original_title || movie.name}</MovieName>
 								<Gauge
 									max={10}

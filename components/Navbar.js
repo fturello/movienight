@@ -4,8 +4,12 @@ import { Search } from "baseui/icon";
 
 const Container = styled("div", {
 	display: "flex",
-	justifyContent: "space-around",
-	margin: "1.5rem",
+	justifyContent: "space-between",
+	marginTop: "1.5rem",
+	marginBottom: "1.5rem",
+	marginLeft: "auto",
+	marginRight: "auto",
+	width: "1200px",
 });
 
 const Brand = styled("a", {
