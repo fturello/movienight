@@ -12,7 +12,7 @@ import "swiper/css/autoplay";
 
 export const getStaticProps = async () => {
 	const res = await fetch(
-		"https://api.themoviedb.org/3/trending/all/day?api_key=8420bcf29704942b5b368531eaf1945a"
+		`https://api.themoviedb.org/3/trending/all/day?api_key=${process.env.API_KEY}&language=fr`
 	);
 	const data = await res.json();
 
@@ -59,6 +59,11 @@ const CardContainer = styled("div", {
 	flexDirection: "column",
 });
 
+const MovieLink = styled(Link, {
+	color: "inherit",
+	textDecoration: "none",
+});
+
 const MovieName = styled("p", {
 	fontSize: "1rem",
 	lineHeight: "1.25rem",
@@ -67,10 +72,9 @@ const MovieName = styled("p", {
 
 const MovieDuration = styled("p", {
 	fontSize: "0.875rem",
+	fontWeight: "400",
 	color: "#9B9B9B",
 });
-
-const Gauge = styled("meter", {});
 
 export default function Home({ movies }) {
 	const [css] = useStyletron();
@@ -154,14 +158,14 @@ export default function Home({ movies }) {
 					<PostersContainer>
 						{mostRecentMovies.map((movie) => (
 							<CardContainer key={movie.id}>
-								<Link
+								<MovieLink
 									href={{
 										pathname: "/MovieDetail",
 										query: {
 											name: `${movie.original_title || movie.name}`,
 										},
 									}}
-									as={`/movie-detail/${movie.original_title || movie.name}`}
+									as={`/movie/${movie.original_title || movie.name}`}
 								>
 									<Image
 										key={movie.id}
@@ -173,8 +177,8 @@ export default function Home({ movies }) {
 											borderRadius: "0.25rem",
 										})}
 									/>
-								</Link>
-								<MovieName>{movie.original_title || movie.name}</MovieName>
+									<MovieName>{movie.original_title || movie.name}</MovieName>
+								</MovieLink>
 								<MovieDuration>1h48</MovieDuration>
 							</CardContainer>
 						))}
@@ -185,7 +189,7 @@ export default function Home({ movies }) {
 					<PostersContainer>
 						{bestRatedMovies.map((movie) => (
 							<CardContainer key={movie.id}>
-								<Link
+								<MovieLink
 									href={{
 										pathname: "/MovieDetail",
 										query: {
@@ -204,9 +208,9 @@ export default function Home({ movies }) {
 											borderRadius: "0.25rem",
 										})}
 									/>
-								</Link>
-								<MovieName>{movie.original_title || movie.name}</MovieName>
-								<Gauge
+									<MovieName>{movie.original_title || movie.name}</MovieName>
+								</MovieLink>
+								<meter
 									max={10}
 									min={0.0}
 									value={movie.vote_average}
@@ -215,7 +219,7 @@ export default function Home({ movies }) {
 									optimum={0.8}
 								>
 									1h48
-								</Gauge>
+								</meter>
 							</CardContainer>
 						))}
 					</PostersContainer>
