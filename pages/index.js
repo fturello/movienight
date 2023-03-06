@@ -1,7 +1,7 @@
 import Navbar from "../components/Navbar";
 import { styled, useStyletron } from "styletron-react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Pagination, Autoplay } from "swiper";
+import { Pagination, Autoplay, Navigation } from "swiper";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -9,17 +9,6 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/autoplay";
-
-export const getStaticProps = async () => {
-	const res = await fetch(
-		`https://api.themoviedb.org/3/trending/all/day?api_key=${process.env.API_KEY}&language=fr`
-	);
-	const data = await res.json();
-
-	return {
-		props: { movies: data },
-	};
-};
 
 const Container = styled("div", {
 	display: "grid",
@@ -143,7 +132,7 @@ export default function Home({ movies }) {
 								<Image
 									src={`https://image.tmdb.org/t/p/w500${movie.backdrop_path}`}
 									alt='Backdrop image'
-									height={350}
+									height={500}
 									width={1200}
 									className={css({
 										borderRadius: "0.5rem",
@@ -155,34 +144,45 @@ export default function Home({ movies }) {
 				</CarouselContainer>
 				<SectionContainer>
 					<Section>À l'affiche cette semaine</Section>
-					<PostersContainer>
-						{mostRecentMovies.map((movie) => (
-							<CardContainer key={movie.id}>
-								<MovieLink
-									href={{
-										pathname: "/MovieDetail",
-										query: {
-											name: `${movie.original_title || movie.name}`,
-										},
-									}}
-									as={`/movie/${movie.original_title || movie.name}`}
-								>
-									<Image
-										key={movie.id}
-										src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-										alt='Poster image'
-										height={200}
-										width={140}
-										className={css({
-											borderRadius: "0.25rem",
-										})}
-									/>
-									<MovieName>{movie.original_title || movie.name}</MovieName>
-								</MovieLink>
-								<MovieDuration>1h48</MovieDuration>
-							</CardContainer>
-						))}
-					</PostersContainer>
+					<Swiper
+						slidesPerView={7}
+						spaceBetween={220}
+						navigation={true}
+						modules={[Navigation]}
+					>
+						<SwiperSlide>
+							<PostersContainer>
+								{mostRecentMovies.map((movie) => (
+									<CardContainer key={movie.id}>
+										<MovieLink
+											href={{
+												pathname: "/MovieDetail",
+												query: {
+													name: `${movie.original_title || movie.name}`,
+												},
+											}}
+											// as={`/movie/${movie.original_title || movie.name}`}
+										>
+											<Image
+												key={movie.id}
+												src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+												alt='Poster image'
+												height={200}
+												width={140}
+												className={css({
+													borderRadius: "0.25rem",
+												})}
+											/>
+											<MovieName>
+												{movie.original_title || movie.name}
+											</MovieName>
+										</MovieLink>
+										<MovieDuration>1h48</MovieDuration>
+									</CardContainer>
+								))}
+							</PostersContainer>
+						</SwiperSlide>
+					</Swiper>
 				</SectionContainer>
 				<SectionContainer>
 					<Section>Les films les mieux notés</Section>
@@ -228,3 +228,14 @@ export default function Home({ movies }) {
 		</>
 	);
 }
+
+export const getStaticProps = async () => {
+	const res = await fetch(
+		`https://api.themoviedb.org/3/trending/all/day?api_key=${process.env.API_KEY}&language=fr`
+	);
+	const data = await res.json();
+
+	return {
+		props: { movies: data },
+	};
+};

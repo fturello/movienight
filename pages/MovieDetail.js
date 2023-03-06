@@ -3,26 +3,12 @@ import Navbar from "../components/Navbar";
 import { styled, useStyletron } from "styletron-react";
 import { Button, SIZE, KIND } from "baseui/button";
 import Image from "next/image";
+
 import Star from "../components/Star";
 
-export const getStaticProps = async () => {
-	const res = await fetch(
-		`https://api.themoviedb.org/3/trending/all/day?api_key=${process.env.API_KEY}&language=fr`
-	);
-	const moviesData = await res.json();
+import trailer from "../assets/trailer.png";
 
-	const res2 = await fetch(
-		`https://api.themoviedb.org/3/genre/movie/list?api_key=${process.env.API_KEY}&language=fr`
-	);
-
-	const genresData = await res2.json();
-
-	return {
-		props: { movies: moviesData, genres: genresData },
-	};
-};
-
-export default function MovieDetail({ movies, genres }) {
+export default function MovieDetail({ movies, genres, credits }) {
 	console.log("genresData ===", genres);
 	const [css] = useStyletron();
 	const moviesData = movies.results;
@@ -53,23 +39,32 @@ export default function MovieDetail({ movies, genres }) {
 		return genre ? genre.name : "";
 	});
 
-	console.log(movieGenres);
+	// console.log(movieGenres);
 
-	const Container = styled("div", {
+	console.log("credits data ===", credits);
+
+	const movieId = selectedMovie.id;
+
+	const GridContainer = styled("div", {
 		display: "grid",
-		gridTemplateColumns: "0.8fr 1.3fr 1.3fr 1.1fr",
+		gridTemplateColumns: "0.5fr 2.2fr 0.5fr",
 		gridTemplateRows: "1fr 1fr 1fr",
-		columnGap: "5rem",
 	});
 
-	const MovieHeaderContainer = styled("div", {
+	const Container = styled("div", {
+		display: "flex",
+		gridColumnStart: "2",
+		width: "1200px",
+		marginTop: "2.4rem",
+		marginLeft: "auto",
+		marginRight: "auto",
+		justifyContent: "space-between",
+	});
+
+	const MovieLeftContainer = styled("div", {
 		display: "flex",
 		flexDirection: "column",
-		// gridColumnStart: "2",
 		width: "436px",
-		marginLeft: "auto",
-		gridColumn: "1 / span 2",
-		// marginRight: "auto",
 	});
 
 	const MovieTitle = styled("h1", {
@@ -95,8 +90,6 @@ export default function MovieDetail({ movies, genres }) {
 		display: "flex",
 	});
 
-	const Gauge = styled("meter", {});
-
 	const ButtonsContainer = styled("div", {
 		display: "flex",
 		gap: "0.5rem",
@@ -111,8 +104,6 @@ export default function MovieDetail({ movies, genres }) {
 	});
 
 	const MovieOverviewContainer = styled("div", {
-		// width: "436px",
-		// height: "240px",
 		marginTop: "2rem",
 	});
 
@@ -122,104 +113,156 @@ export default function MovieDetail({ movies, genres }) {
 	});
 
 	const PosterContainer = styled("div", {
-		// gridColumnStart: "4",
-		// gridColumn: "2 / span 3",
+		// gridColumn: "2 / span 2",
 	});
 
-	const CastingsContainer = styled("div", {
+	const DirectionsContainer = styled("div", {
 		display: "flex",
 		flexWrap: "wrap",
 		justifyContent: "space-between",
 		marginTop: "3rem",
 	});
 
-	const CastingContainer = styled("div", {
+	const DirectionContainer = styled("div", {
 		display: "flex",
 		flexDirection: "column",
+		// marginBottom: "1rem",
+		// ":not(:first-child)": {
+		// 	marginBottom: "0",
+		// },
+	});
+
+	const TrailersContainer = styled("div", {
+		display: "flex",
+		flexDirection: "column",
+		gridRowStart: "2",
+	});
+
+	const TrailerTitle = styled("h1", {
+		fontSize: "1.25rem",
+		marginTop: "3rem",
+		marginBottom: "1.25rem",
+	});
+
+	const TrailerVideos = styled("div", {
+		display: "flex",
+		gap: "2rem",
 	});
 
 	return (
 		<>
 			<Navbar />
-			<Container>
-				<MovieHeaderContainer>
-					<MovieTitle>{selectedMovie.title}</MovieTitle>
-					<MovieDate>({selectedMovie.release_date})</MovieDate>
-					<MovieSpec>{movieGenres.join(", ")}</MovieSpec>
-					<MovieInfoContainer>
-						<MovieSpec>2h22</MovieSpec>
-						<Gauge
-							max={10}
-							min={0.0}
-							value={selectedMovie.vote_average}
-							high={0.75}
-							low={0.25}
-							optimum={0.8}
-						></Gauge>
-					</MovieInfoContainer>
-					<ButtonsContainer>
-						<Button
-							size={SIZE.compact}
-							kind={KIND.secondary}
-							overrides={{
-								BaseButton: {
-									style: {
-										width: "6.7rem",
-										fontFamily: "Archivo",
-										fontSize: "1rem",
+			<GridContainer>
+				<Container>
+					<MovieLeftContainer>
+						<MovieTitle>{selectedMovie.title}</MovieTitle>
+						<MovieDate>({selectedMovie.release_date})</MovieDate>
+						<MovieSpec>{movieGenres.join(", ")}</MovieSpec>
+						<MovieInfoContainer>
+							<MovieSpec>2h22</MovieSpec>
+							<meter
+								max={10}
+								min={0.0}
+								value={selectedMovie.vote_average}
+								high={0.75}
+								low={0.25}
+								optimum={0.8}
+							></meter>
+						</MovieInfoContainer>
+						<ButtonsContainer>
+							<Button
+								size={SIZE.compact}
+								kind={KIND.secondary}
+								overrides={{
+									BaseButton: {
+										style: {
+											width: "6.7rem",
+											fontFamily: "Archivo",
+											fontSize: "1rem",
+										},
 									},
-								},
-							}}
-						>
-							Regarder
-						</Button>
-						<Button
-							size={SIZE.compact}
-							overrides={{
-								BaseButton: {
-									style: {
-										width: "4.1rem",
-										outline: "1px #ffffff solid",
-										// borderRadius: "0.5rem",
-										backgroundColor: "#00000000",
+								}}
+							>
+								Regarder
+							</Button>
+							<Button
+								size={SIZE.compact}
+								overrides={{
+									BaseButton: {
+										style: {
+											width: "4.1rem",
+											outline: "1px #ffffff solid",
+											backgroundColor: "#00000000",
+										},
 									},
-								},
-							}}
-						>
-							<Star />
-						</Button>
-					</ButtonsContainer>
-					<MovieOverviewContainer>
-						<SmallTitle>Synopsis</SmallTitle>
-						<MovieOverview>{selectedMovie.overview}</MovieOverview>
-					</MovieOverviewContainer>
-					<CastingsContainer>
-						<CastingContainer>
-							<SmallTitle>Screenplay, Story</SmallTitle>
-							<MovieOverview>Josh Miller</MovieOverview>
-							<SmallTitle>Director</SmallTitle>
-							<MovieOverview>Jeff Fowler</MovieOverview>
-						</CastingContainer>
-						<CastingContainer>
-							<SmallTitle>Screenplay, Story</SmallTitle>
-							<MovieOverview>Patrick Casey</MovieOverview>
-							<SmallTitle>Screenplay</SmallTitle>
-							<MovieOverview>John Whittington</MovieOverview>
-						</CastingContainer>
-					</CastingsContainer>
-				</MovieHeaderContainer>
-				<PosterContainer>
-					<Image
-						src={`https://image.tmdb.org/t/p/w500${selectedMovie.poster_path}`}
-						alt='Poster image'
-						height={654}
-						width={436}
-						className={css({
-							borderRadius: "0.25rem",
-						})}
-					/>
-				</PosterContainer>
-			</Container>
+								}}
+							>
+								<Star />
+							</Button>
+						</ButtonsContainer>
+						<MovieOverviewContainer>
+							<SmallTitle>Synopsis</SmallTitle>
+							<MovieOverview>{selectedMovie.overview}</MovieOverview>
+						</MovieOverviewContainer>
+						<DirectionsContainer>
+							<DirectionContainer>
+								<SmallTitle>Screenplay, Story</SmallTitle>
+								<MovieOverview>Josh Miller</MovieOverview>
+								<SmallTitle>Director</SmallTitle>
+								<MovieOverview>Jeff Fowler</MovieOverview>
+							</DirectionContainer>
+							<DirectionContainer>
+								<SmallTitle>Screenplay, Story</SmallTitle>
+								<MovieOverview>Patrick Casey</MovieOverview>
+								<SmallTitle>Screenplay</SmallTitle>
+								<MovieOverview>John Whittington</MovieOverview>
+							</DirectionContainer>
+						</DirectionsContainer>
+						<TrailersContainer>
+							<TrailerTitle>Bandes annonces</TrailerTitle>
+							<TrailerVideos>
+								<Image src={trailer} height={193} width={344} />
+								<Image src={trailer} height={193} width={344} />
+								<Image src={trailer} height={193} width={344} />
+							</TrailerVideos>
+						</TrailersContainer>
+					</MovieLeftContainer>
+					<PosterContainer>
+						<Image
+							src={`https://image.tmdb.org/t/p/w500${selectedMovie.poster_path}`}
+							alt='Poster image'
+							height={654}
+							width={436}
+							className={css({
+								borderRadius: "0.25rem",
+							})}
+						/>
+					</PosterContainer>
+				</Container>
+			</GridContainer>
 		</>
 	);
 }
+
+export const getStaticProps = async ({ movieId }) => {
+	const res = await fetch(
+		`https://api.themoviedb.org/3/trending/all/day?api_key=${process.env.API_KEY}&language=fr`
+	);
+	const moviesData = await res.json();
+
+	const res2 = await fetch(
+		`https://api.themoviedb.org/3/genre/movie/list?api_key=${process.env.API_KEY}&language=fr`
+	);
+
+	const genresData = await res2.json();
+
+	const res3 = await fetch(
+		`https://api.themoviedb.org/3/movie/123?api_key=${process.env.API_KEY}&language=fr&append_to_response=credits`
+	);
+
+	const creditsData = await res3.json();
+
+	return {
+		props: { movies: moviesData, genres: genresData, credits: creditsData },
+	};
+};
