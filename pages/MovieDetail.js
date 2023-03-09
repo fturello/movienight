@@ -1,15 +1,14 @@
 import { useRouter } from "next/router";
-import Navbar from "../components/Navbar";
 import { styled, useStyletron } from "styletron-react";
 import { Button, SIZE, KIND } from "baseui/button";
 import Image from "next/image";
 
+import Navbar from "../components/Navbar";
 import Star from "../components/Star";
 
 import trailer from "../assets/trailer.png";
 
-export default function MovieDetail({ movies, genres, credits }) {
-	// console.log("genresData ===", genres);
+export default function MovieDetail({ movies, genres }) {
 	const [css] = useStyletron();
 	const moviesResults = movies.results;
 
@@ -22,10 +21,7 @@ export default function MovieDetail({ movies, genres, credits }) {
 			movie.title === movieName ||
 			movie.name === movieName
 	);
-
 	const selectedMovie = filteredMovie[0];
-
-	// console.log("// selectedMovie ==", selectedMovie);
 
 	const formatDate = (selectedMovie) => {
 		return selectedMovie.release_date
@@ -33,20 +29,10 @@ export default function MovieDetail({ movies, genres, credits }) {
 			: selectedMovie.first_air_date.slice(0, 4);
 	};
 
-	// console.log("genres ===", genres);
-
 	const movieGenres = selectedMovie.genre_ids.map((id) => {
 		const genre = genres.genres.find((g) => g.id === id);
 		return genre ? genre.name : "";
 	});
-
-	// console.log(movieGenres);
-
-	console.log("credits data ===", credits);
-
-	const movieId = selectedMovie.id;
-
-	console.log(movieId);
 
 	const GridContainer = styled("div", {
 		display: "grid",
@@ -115,10 +101,6 @@ export default function MovieDetail({ movies, genres, credits }) {
 		lineHeight: "24px",
 	});
 
-	const PosterContainer = styled("div", {
-		// gridColumn: "2 / span 2",
-	});
-
 	const DirectionsContainer = styled("div", {
 		display: "flex",
 		flexWrap: "wrap",
@@ -129,10 +111,6 @@ export default function MovieDetail({ movies, genres, credits }) {
 	const DirectionContainer = styled("div", {
 		display: "flex",
 		flexDirection: "column",
-		// marginBottom: "1rem",
-		// ":not(:first-child)": {
-		// 	marginBottom: "0",
-		// },
 	});
 
 	const TrailersContainer = styled("div", {
@@ -245,24 +223,22 @@ export default function MovieDetail({ movies, genres, credits }) {
 							</TrailerVideos>
 						</TrailersContainer>
 					</MovieLeftContainer>
-					<PosterContainer>
-						<Image
-							src={`https://image.tmdb.org/t/p/w500${selectedMovie.poster_path}`}
-							alt='Poster image'
-							height={654}
-							width={436}
-							className={css({
-								borderRadius: "0.25rem",
-							})}
-						/>
-					</PosterContainer>
+					<Image
+						src={`https://image.tmdb.org/t/p/w500${selectedMovie.poster_path}`}
+						alt='Poster image'
+						height={654}
+						width={436}
+						className={css({
+							borderRadius: "0.25rem",
+						})}
+					/>
 				</Container>
 			</GridContainer>
 		</>
 	);
 }
 
-export const getStaticProps = async (movieId) => {
+export const getStaticProps = async () => {
 	const res = await fetch(
 		`https://api.themoviedb.org/3/trending/all/day?api_key=${process.env.API_KEY}&language=fr`
 	);
@@ -273,14 +249,7 @@ export const getStaticProps = async (movieId) => {
 	);
 	const genresData = await res2.json();
 
-	console.log("fetch movieId ===", movieId);
-
-	const res3 = await fetch(
-		`https://api.themoviedb.org/3/movie/123?api_key=${process.env.API_KEY}&language=fr&append_to_response=credits`
-	);
-	const creditsData = await res3.json();
-
 	return {
-		props: { movies: moviesData, genres: genresData, credits: creditsData },
+		props: { movies: moviesData, genres: genresData },
 	};
 };

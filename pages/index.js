@@ -1,10 +1,11 @@
 import { useState } from "react";
-import Navbar from "../components/Navbar";
 import { styled, useStyletron } from "styletron-react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Pagination, Autoplay, Navigation } from "swiper";
+import { Pagination, Autoplay } from "swiper";
 import Image from "next/image";
 import Link from "next/link";
+
+import Navbar from "../components/Navbar";
 
 import "swiper/css";
 import "swiper/css/navigation";
@@ -103,16 +104,11 @@ const MovieDuration = styled("p", {
 });
 
 export default function Home({ movies }) {
+	const [css] = useStyletron();
 	const [searchTerm, setSearchTerm] = useState([""]);
 	const [filteredMovies, setFilteredMovies] = useState([]);
 
-	console.log("filteredMovies ===", filteredMovies);
-
-	const [css] = useStyletron();
-
-	let moviesData = movies.results;
-	console.log("// moviesData ===", moviesData);
-	console.log(moviesData[0].title);
+	const moviesData = movies.results;
 
 	const firstThreeTrendingMovies = moviesData.slice(0, 3);
 
@@ -128,19 +124,7 @@ export default function Home({ movies }) {
 	);
 	const bestRatedMovies = moviesSortedByRatings.slice(0, 7);
 
-	// const handleSearch = (searchTerm) => {
-	// 	const filtered = moviesData.filter((movie) =>
-	// 		movie.title.toLowerCase().includes(searchTerm.toLowerCase())
-	// 	);
-	// 	setFilteredMovies(filtered);
-	// };
-
-	// const handleSearch = (term) => {
-	// 	setSearchTerm(term);
-	// };
-
 	const handleSearch = (searchTerm) => {
-		// console.log(searchTerm);
 		let filtered = [];
 		if (searchTerm !== "") {
 			filtered = moviesData.filter(
@@ -149,7 +133,7 @@ export default function Home({ movies }) {
 					movie.title.toLowerCase().includes(searchTerm.toLowerCase())
 			);
 		}
-		console.log(filtered);
+		
 		setFilteredMovies(filtered);
 		setSearchTerm(searchTerm);
 	};
@@ -241,7 +225,6 @@ export default function Home({ movies }) {
 													name: `${movie.original_title || movie.name}`,
 												},
 											}}
-											// as={`/movie/${movie.original_title || movie.name}`}
 										>
 											<Image
 												key={movie.id}
