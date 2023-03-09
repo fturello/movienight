@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { styled } from "styletron-react";
 import { Input } from "baseui/input";
 import { Search } from "baseui/icon";
@@ -21,13 +22,23 @@ const Brand = styled("a", {
 	color: "inherit",
 });
 
-export default function Navbar() {
+export default function Navbar(props) {
+	const [searchTerm, setSearchTerm] = useState("");
+
+	const handleInputChange = (event) => {
+		const value = event.target.value;
+		setSearchTerm(value);
+		props.onSearch(value);
+	};
+
 	return (
 		<Container>
 			<Brand href='/'>movienight</Brand>
 			<Input
 				startEnhancer={<Search size='30px' />}
 				placeholder='Rechercher un film, un réalisteur, un acteur'
+				value={searchTerm}
+				onChange={handleInputChange}
 				overrides={{
 					Root: {
 						style: {

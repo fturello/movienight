@@ -9,30 +9,31 @@ import Star from "../components/Star";
 import trailer from "../assets/trailer.png";
 
 export default function MovieDetail({ movies, genres, credits }) {
-	console.log("genresData ===", genres);
+	// console.log("genresData ===", genres);
 	const [css] = useStyletron();
-	const moviesData = movies.results;
+	const moviesResults = movies.results;
 
 	const router = useRouter();
 	const movieName = router.query.name;
 
-	console.log("query name ///", movieName);
-
-	// console.log("original title ///", moviesData.original_title);
-	// console.log("name ///", moviesData.name);
-	// console.log("title ///", moviesData.title);
-
-	const filteredMovie = moviesData.filter(
-		(movie) => movie.original_title === movieName
+	const filteredMovie = moviesResults.filter(
+		(movie) =>
+			movie.original_title === movieName ||
+			movie.title === movieName ||
+			movie.name === movieName
 	);
 
 	const selectedMovie = filteredMovie[0];
 
-	console.log("// selectedMovie ==", selectedMovie);
+	// console.log("// selectedMovie ==", selectedMovie);
 
-	// console.log(selectedMovie.release_date.slice(0, 4));
+	const formatDate = (selectedMovie) => {
+		return selectedMovie.release_date
+			? selectedMovie.release_date.slice(0, 4)
+			: selectedMovie.first_air_date.slice(0, 4);
+	};
 
-	console.log("genres ===", genres);
+	// console.log("genres ===", genres);
 
 	const movieGenres = selectedMovie.genre_ids.map((id) => {
 		const genre = genres.genres.find((g) => g.id === id);
@@ -44,6 +45,8 @@ export default function MovieDetail({ movies, genres, credits }) {
 	console.log("credits data ===", credits);
 
 	const movieId = selectedMovie.id;
+
+	console.log(movieId);
 
 	const GridContainer = styled("div", {
 		display: "grid",
@@ -155,8 +158,8 @@ export default function MovieDetail({ movies, genres, credits }) {
 			<GridContainer>
 				<Container>
 					<MovieLeftContainer>
-						<MovieTitle>{selectedMovie.title}</MovieTitle>
-						<MovieDate>({selectedMovie.release_date})</MovieDate>
+						<MovieTitle>{selectedMovie.title || selectedMovie.name}</MovieTitle>
+						<MovieDate>({formatDate(selectedMovie)})</MovieDate>
 						<MovieSpec>{movieGenres.join(", ")}</MovieSpec>
 						<MovieInfoContainer>
 							<MovieSpec>2h22</MovieSpec>
@@ -221,9 +224,24 @@ export default function MovieDetail({ movies, genres, credits }) {
 						<TrailersContainer>
 							<TrailerTitle>Bandes annonces</TrailerTitle>
 							<TrailerVideos>
-								<Image src={trailer} height={193} width={344} />
-								<Image src={trailer} height={193} width={344} />
-								<Image src={trailer} height={193} width={344} />
+								<Image
+									src={trailer}
+									height={193}
+									width={344}
+									alt='Trailer video'
+								/>
+								<Image
+									src={trailer}
+									height={193}
+									width={344}
+									alt='Trailer video'
+								/>
+								<Image
+									src={trailer}
+									height={193}
+									width={344}
+									alt='Trailer video'
+								/>
 							</TrailerVideos>
 						</TrailersContainer>
 					</MovieLeftContainer>
@@ -244,7 +262,7 @@ export default function MovieDetail({ movies, genres, credits }) {
 	);
 }
 
-export const getStaticProps = async ({ movieId }) => {
+export const getStaticProps = async (movieId) => {
 	const res = await fetch(
 		`https://api.themoviedb.org/3/trending/all/day?api_key=${process.env.API_KEY}&language=fr`
 	);
@@ -253,13 +271,13 @@ export const getStaticProps = async ({ movieId }) => {
 	const res2 = await fetch(
 		`https://api.themoviedb.org/3/genre/movie/list?api_key=${process.env.API_KEY}&language=fr`
 	);
-
 	const genresData = await res2.json();
+
+	console.log("fetch movieId ===", movieId);
 
 	const res3 = await fetch(
 		`https://api.themoviedb.org/3/movie/123?api_key=${process.env.API_KEY}&language=fr&append_to_response=credits`
 	);
-
 	const creditsData = await res3.json();
 
 	return {
