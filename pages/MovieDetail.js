@@ -121,7 +121,7 @@ export default function MovieDetail({ movies, genres }) {
 
 	const TrailerTitle = styled("h1", {
 		fontSize: "1.25rem",
-		marginTop: "3rem",
+		marginTop: "5rem",
 		marginBottom: "1.25rem",
 	});
 
